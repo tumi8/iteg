@@ -1,1 +1,4 @@
-# TMA 2024 ITEG Additional Material
+# ITEG: Additional Material
+
+    bundle install
+    bundle exec jekyll serve --livereload
