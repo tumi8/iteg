@@ -1,0 +1,40 @@
+services:
+  parser:
+    build: ./spark-parsing
+    command: --cleanup True /opt/parse_graph.py --args "--cache-dir /app/cache_dir --out /app/out --output-type csv --parallelization 8 --tls-scan 2024-02-29 /app/tls --dns-scan tranco-A 2024-02-29 /app/dns/resolved-A.ipdomain --dns-scan tranco-AAAA 2024-02-29 /app/dns/resolved-AAAA.ipdomain"
+    ports:
+      - "127.0.0.1:4046:4040"
+    volumes:
+      - type: bind
+        source: ./example-data/dns
+        target: /app/dns
+        read_only: true
+      - type: bind
+        source: ./example-data/tls
+        target: /app/tls
+        read_only: true
+      - type: bind
+        source: ./example-data/cache_dir
+        target: /app/cache_dir
+      - type: bind
+        source: ./example-data/tls_graph
+        target: /app/out
+  ptp:
+    build: ./spark-parsing
+    command: --cleanup True /opt/run_ptp.py --args "--cache-dir /app/cache_dir --input-dir /app/exp --out /app/out --epsilon 0.01 --output-type csv --parallelization 8"
+    ports:
+      - "127.0.0.1:4046:4040"
+    volumes:
+      - type: bind
+        source: ./example-data/blocklists
+        target: /app/exp/blocklists
+      - type: bind
+        source: ./example-data/cache_dir
+        target: /app/cache_dir
+      - type: bind
+        source: ./example-data/tls_graph
+        target: /app/exp/tls_graph
+      - type: bind
+        source: ./example-data/tls_graph_ptp
+        target: /app/out
+
