@@ -32,6 +32,7 @@ The PTP algorithm can be run with docker and spark in the provided container.
 The following tables show the IP addresses and domains with a score of 100% found with the blocked SSLBL certificates as input.
 We checked each entry with Virus Total and appended the aggregated class (according to the paper).
 Interestingly, even when scanning just the Tranco Top 1 Million websites, we found several Domains and IP addresses with a high threat score and also Virus Total identifies them as potentially malicious.
+Just a high threat score does not mean that these addresses and domains are actually malicious, they are just somehow related to malicious entries through the ITEG; however, they can be a good starting point for a more thorough analysis searching for unknown threats. 
 
 | Domain              | VT class   |
 |---------------------|------------|
