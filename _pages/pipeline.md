@@ -16,7 +16,7 @@ cd graph-pipeline
 git lfs pull
 {% endhighlight %}
 
-Git-LFS is only used for the example graph (please decompress the data before usage).
+Git-LFS is only used for the example data.
 For simplicity, we excluded the full IPv4 address space scan (performed with [ZMap](https://zmap.io/)) and the scan for an open port 443 on IPv6 Addresses with [zmapv6](https://github.com/topics/zmapv6) in this example.
 In the following we explain the steps necessary to reproduce the `example-data/` from the repository.
 
@@ -27,10 +27,10 @@ However, we skipt the latter in this example and, instead, use the IP addresses 
 For this example, we used the [Tranco](https://tranco-list.eu/) top 1M domains, the [SSLBL](https://sslbl.abuse.ch/), and the [Feodo Tracker](https://feodotracker.abuse.ch/):
 
 {% highlight bash %}
-curl https://tranco-list.eu/download/W9K29/1000000 | cut -d , -f 2 > example-data/tranco-input.txt
-curl https://sslbl.abuse.ch/blacklist/sslblacklist.csv > example-data/blocklists/abuse_ch_sslbl.csv
+curl https://tranco-list.eu/download/G6Z3K/1000000 | cut -d , -f 2 > example-data/tranco-input.txt
+curl https://sslbl.abuse.ch/blacklist/sslblacklist.csv > example-data/blocklists/abuse_ch_sslbl.sha1.csv
 curl https://sslbl.abuse.ch/blacklist/sslipblacklist.csv > example-data/blocklists/abuse_ch_sslbl.ip.csv
-curl https://feodotracker.abuse.ch/downloads/ipblocklist.csv > example-data/abuse_ch_feodo.ip.csv
+curl https://feodotracker.abuse.ch/downloads/ipblocklist.csv > example-data/blocklists/abuse_ch_feodo.ip.csv
 {% endhighlight %}
 
 ## 2. DNS Resolutions
@@ -53,13 +53,14 @@ This creates two files each for the IPv4 and IPv6 DNS resolutions.
 ## 3. The TLS Scan
 
 Our TLS measruements were performed with the [TUM goscanner](https://github.com/tumi8/goscanner.git).
+Please download and build the scanner.
 The scanner needs a single input file:
 
-{% highlight bash %}
+```bash
 cat <(grep -F "#" -v example-data/blocklists/abuse_ch_sslbl.ip.csv | cut -d , --output-delimiter ":" -f 2,3) \
     <(grep -F "#" -v example-data/blocklists/abuse_ch_feodo.ip.csv | csvtool -u : col 2,3 - | tail -n +2) \
     example-data/dns/*.ipdomain | shuf > example-data/goscanner-input.csv
-{% endhighlight %}
+```
 
 Then, we can start with the actual TLS measurements:
 
@@ -83,13 +84,14 @@ Note the necessary cache directory that can be deleted after the run.
 ./create_graph.sh
 {% endhighlight %}
 
-## 5. Explore and Analyze the ITEG
+### 5. Explore and Analyze the ITEG
 
 Our parsing pipeline produces multiple files for each type of edge and node that can be analyzed with other tools.
-For example, the CSV output under `example-data/ITEG` can be directly imported into Neo4J.
+For example, the CSV output under `example-data/tls_graph` can be directly imported into Neo4J.
+Although, they need to be decompressed (e.g., with `zstd --rm -d *.zst`).
 
 {% highlight bash %}
-./import_neo4j.sh example-data/ITEG
+./import_neo4j.sh example-data/tls_graph
 {% endhighlight %}
 
 
@@ -97,7 +99,16 @@ We experienced that Neo4J provides a convenient Interface to manually explore th
 
 The output of the Neo4J schema function:
 
-![Schema of the Example-Graph](/assets/example_schema.svg){:style="display:block; margin-left:auto; margin-right:auto"}
+![Schema of the Example-Graph]({{site.baseurl}}/assets/schema.svg){:style="display:block; margin-left:auto; margin-right:auto"}
 
 Note that there were IP Addresses embedded as Altertnative Name in some certificates. These were always self-signed certificates.
 However, we did not consider such cases in the paper.
+
+#### The TMA website
+
+tma.ifip.org was not on the tranco top list, but we manually added it for demonstration.
+If you are running Neo4J you can see yourself, or have a look at the following excerpt:
+
+![Example from the Graph]({{site.baseurl}}/assets/example_ifip_tma.svg){:style="display:block; margin-left:auto; margin-right:auto"}
+
+You can see that tma.ifip.org is quite isolated, it has its own IP address and certificate. However, the parent domain ifip.org has a certificate that reveal the alias ifip.or.at. 
