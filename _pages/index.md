@@ -3,7 +3,7 @@ layout: page
 toc: Home
 permalink: /
 order: 1
-title: "Thret Intelligence with an Internet-wide TLS Ecosystem Graph Model"
+title: "Providing Threat Intelligence with an Internet-wide TLS Ecosystem Graph Model"
 description: "Additional material for the publication \"Propagating Threat Scores With a TLS Ecosystem Graph Model Derived by Active Measurements\", providing access to published data and tools."
 ---
 
