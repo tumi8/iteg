@@ -1,20 +1,20 @@
 ---
-layout: post
-title: Graph-Pipeline
+layout: page
+title: Graph-Parsing Pipeline and Example Data
 permalink: /graph-pipeline/
---- 
+order: 3
+toc: Graph-Pipeline
+description: "To enable reproducible results and help in understanding our approach we have open-sourced the full parsing pipeline that can create the ITEG from our paper."
+---
 
-# Graph-Parsing Pipeline and Example Data
-
-To enable reproducable results and help in understanding our approach we have open-sourced the full parsing pipeline that can create the ITEG from our paper.
-Additionally, the repository contains an example graph created from the [Tranco](https://tranco-list.eu/) top 1M list that can be directly imported and explored via [Neo4J](https://neo4j.com/).
+Additionally, the repository contains an example graph created from the [Tranco Top 1M](https://tranco-list.eu/) list that can be directly imported and explored via [Neo4J](https://neo4j.com/).
 The code and data can be found [[here]({{ site.github_link }})] or directly via Git:
 
-{% highlight bash %}
+```bash
 git clone {{ site.github_ssh }}
 cd graph-pipeline
 git lfs pull
-{% endhighlight %}
+```
 
 Git-LFS is only used for the example data.
 For simplicity, we excluded the full IPv4 address space scan (performed with [ZMap](https://zmap.io/)) and the scan for an open port 443 on IPv6 Addresses with [zmapv6](https://github.com/topics/zmapv6) in this example.
@@ -26,27 +26,29 @@ The input for our ITEG was a domain name list and a full IPv4 address space scan
 However, we skipt the latter in this example and, instead, use the IP addresses from the blocklists as additional input. 
 For this example, we used the [Tranco](https://tranco-list.eu/) top 1M domains, the [SSLBL](https://sslbl.abuse.ch/), and the [Feodo Tracker](https://feodotracker.abuse.ch/):
 
-{% highlight bash %}
+```bash
 curl https://tranco-list.eu/download/G6Z3K/1000000 | cut -d , -f 2 > example-data/tranco-input.txt
 curl https://sslbl.abuse.ch/blacklist/sslblacklist.csv > example-data/blocklists/abuse_ch_sslbl.sha1.csv
 curl https://sslbl.abuse.ch/blacklist/sslipblacklist.csv > example-data/blocklists/abuse_ch_sslbl.ip.csv
 curl https://feodotracker.abuse.ch/downloads/ipblocklist.csv > example-data/blocklists/abuse_ch_feodo.ip.csv
-{% endhighlight %}
+```
 
 ## 2. DNS Resolutions
 
 We have used a local [unbound](https://www.nlnetlabs.nl/projects/unbound/about/) server and [massdns](https://github.com/blechschmidt/massdns) for our large-scale DNS resolutions.
 Any software would work that produces a CSV file like the following:
 
-    172.217.16.206,google.com
-    2a00:1450:4001:806::200e,google.com
+{% highlight bash %}
+172.217.16.206,google.com
+2a00:1450:4001:806::200e,google.com
+{% endhighlight %}
 
 We started with a list of domains names (`example-data/tranco-input.txt`), resolved them via massdns, and parsed the output into the proper format:
 
-{% highlight bash %}
+```bash
 massdns  -o J -t AAAA -t A --filter NOERROR -r ./example-data/resolvers.txt \
     example-data/tranco-input.txt  | ./parse_massdns.py --output example-data/dns
-{% endhighlight %}
+```
 
 This creates two files each for the IPv4 and IPv6 DNS resolutions.
 
@@ -64,12 +66,12 @@ cat <(grep -F "#" -v example-data/blocklists/abuse_ch_sslbl.ip.csv | cut -d , --
 
 Then, we can start with the actual TLS measurements:
 
-{% highlight bash %}
+```bash
 ulimit -n 1024000
 goscanner -C example-data/goscanner.conf \
     --input-file example-data/goscanner-input.csv \
     --output example-data/tls
-{% endhighlight %}
+```
 
 
 ## 4. Combining it all as ITEG
@@ -80,9 +82,9 @@ Have a look at the `docker-compose.yml` and the parsing script for further detai
 The script extracts the scan dates from the directory name of the input.
 Note the necessary cache directory that can be deleted after the run.
 
-{% highlight bash %}
+```bash
 ./create_graph.sh
-{% endhighlight %}
+```
 
 ### 5. Explore and Analyze the ITEG
 
@@ -90,9 +92,9 @@ Our parsing pipeline produces multiple files for each type of edge and node that
 For example, the CSV output under `example-data/tls_graph` can be directly imported into Neo4J.
 Although, they need to be decompressed (e.g., with `zstd --rm -d *.zst`).
 
-{% highlight bash %}
+```bash
 ./import_neo4j.sh example-data/tls_graph
-{% endhighlight %}
+```
 
 
 We experienced that Neo4J provides a convenient Interface to manually explore the graph; however, for more advanced analyses we recommend tools like Apache Spark with the [GraphFrames](https://graphframes.github.io/graphframes/) library.

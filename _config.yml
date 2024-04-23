@@ -1,17 +1,27 @@
+
 title: ITEG
-email:
+author: Markus Sosnowski
 description: >-
     Additional Material
-baseurl: "/tma2024-iteg" # the subpath of your site, e.g. /blog
+baseurl: "/iteg" # the subpath of your site, e.g. /blog
+url: "https://tumi8.github.io"
 
-github_ssh: git@github.com:tma2024-iteg/tma2024-iteg.git
-github_link: https://github.com/tma2024-iteg/tma2024-iteg
+github_ssh: git@github.com:tumi8/iteg.git
+github_link: https://github.com/tumi8/iteg
 
-github_username:
+github_username: syncall
 
-theme: minima
+header_pages:
+  - pages/index.md
+  - pages/figures.md
+  - pages/pipeline.md
+  - pages/ptp.md
+
+remote_theme: tumi8/tumi8-theme
+
 plugins:
   - jekyll-feed
+  - jekyll-seo-tag
   - jekyll-remote-theme
 
 

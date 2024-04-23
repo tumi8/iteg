@@ -1,7 +1,10 @@
 ---
-layout: post
+layout: page
 title: Figures
 permalink: /figures/
+order: 2
+toc: Figures
+description: "Interactive versions of the figures from our paper."
 ---
 
 <script charset="utf-8" src="{{ site.baseurl }}{% link assets/plotly.min.js %}"></script>
