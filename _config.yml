@@ -1,8 +1,6 @@
 
-title: ITEG
+title: "ITEG: Additional Material"
 author: Markus Sosnowski
-description: >-
-    Additional Material
 baseurl: "/iteg" # the subpath of your site, e.g. /blog
 url: "https://tumi8.github.io"
 
