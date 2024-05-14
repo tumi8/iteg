@@ -7,7 +7,7 @@ title: "Providing Threat Intelligence with an Internet-wide TLS Ecosystem Graph 
 description: "Additional material for the publication \"Propagating Threat Scores With a TLS Ecosystem Graph Model Derived by Active Measurements\", providing access to published data and tools."
 ---
 
-Read our final version over ifip: *[[PDF]](https://tma.ifip.org/2024/wp-content/uploads/sites/13/2024/05/tma2024-final19.pdf)*
+Read our final version over ifip: **[[PDF]](https://tma.ifip.org/2024/wp-content/uploads/sites/13/2024/05/tma2024-final19.pdf)**
 
 <div class="accordion-box">
   <div class="accordion-box__title">
